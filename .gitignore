@@ -24,8 +24,15 @@ msg_gen/
 /px4_ros/src/px4_ros/msg/
 /vicon_bridge/CMakeFiles/download_extra_data.dir/
 /vicon_bridge/devel/
+/vicon_bridge/docs/
 /vicon_bridge/cmake/
-/vicon_bridge/gtest
+/vicon_bridge/gtest/
 /vicon_bridge/CMakeCache.txt
+/vicon_bride/catkin/
 /vicon_bridge/catkin_generated/
 /vicon_bridge/CMakeFiles/
+/vicon_bridge/test_results/
+/vicon_bridge/cmake_install.cmake
+/vicon_bridge/CTestTestfile.cmake
+/vicon_bridge/Makefile
+/vicon_bridge/setup_custom_pythpath.sh
