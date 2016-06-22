@@ -1,0 +1,5 @@
+cd to this directory
+
+git submodule init
+cd vicon_bridge
+cmake ./
