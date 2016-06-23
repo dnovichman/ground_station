@@ -1,0 +1,22 @@
+<package>
+  <description brief="log_data">
+
+     log_data
+
+  </description>
+  <author>dnovichman</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/log_data</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="lmpc_v1"/>
+  <depend package="px4_ros"/>
+  <depend package="tf"/>
+  <depend package="lmpc_v1"/>
+
+</package>
+
+

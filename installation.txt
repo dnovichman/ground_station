@@ -1,6 +1,10 @@
 cd to this directory
 
 git submodule init
+git submodule update
+
 cd vicon_bridge
 cmake ./
 make
+
+cd into each directory and enter "make"

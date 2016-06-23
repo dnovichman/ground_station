@@ -1,0 +1,12 @@
+% Ground Station Command
+source ./devel/setup.bash
+
+sudo apt-get install ros-indigo-mavros ros-indigo-mavros-extras
+
+for the node manager:
+
+
+https://github.com/mavlink/mavros/blob/master/mavros/README.md
+sudo apt-get install ros-indigo-default-cfg-fkie
+
+rosrun mavros mavros_node _fcu_url:=/dev/ttyUSB0:115200 _gcs_url:=tcp-l://

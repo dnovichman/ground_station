@@ -1,0 +1,21 @@
+<package>
+  <description brief="mavlink_ros">
+
+     mavlink_ros
+
+  </description>
+  <author>dnovichman</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mavlink_ros</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="px4_ros"/>
+  <depend package="lmpc_v1"/>
+
+</package>
+
+

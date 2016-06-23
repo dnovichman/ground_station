@@ -10,6 +10,7 @@ msg_gen/
 /lmpc_v1/bin/
 /lmpc_v1/src/lmpc_v1/msg/
 /log_data/bin/
+log_data/lib/
 /log_data/logs/
 /mavlink_ros/CMakeCache.txt
 /mavlink_ros/CMakeFiles/
