@@ -1,6 +1,7 @@
-This is the ground station software for our PX4 customised avionics system
+This is the ground station software for our PX4_stack customised avionics system
 which can be cloned from
-git@cvr-eng.cecs.anu.edu.au:juan.adarve/anu-avionics.git
+git@cvr-eng.cecs.anu.edu.au:juan.adarve/anu-avionics.git or 
+https://github.com/dnovichman/Firmware/tree/moses-dev
 
 It contains the following ros packages
 control_input
@@ -10,7 +11,7 @@ mavlink_ros
 log_data
 phone
 
-The description of these packages is found in Chapter 3 of my thesis.
+The description of these packages is found in Chapter 3 of the PhD thesis "Aerodynamics and Control of Quadrotors" by Moses Bangura, Australian National University 2016..
 
 Installation of the ground station is described in the wiki.
 

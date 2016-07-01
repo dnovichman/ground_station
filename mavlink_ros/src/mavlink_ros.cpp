@@ -377,7 +377,7 @@ void write_to_mavlink(void* serial_ptr)
 
 		// TODO only publish when data is available
 		float check_time = pos.usec ;
-		float old_time_check;
+		float old_time_check = 0.0f;
 		stuff_vehicle_vic_gps();
 
 		if (dt !=dt || dt > 0.02f)
