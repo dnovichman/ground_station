@@ -23,8 +23,8 @@ from std_msgs.msg import Float64MultiArray
 from tf.msg import tfMessage
 from rospy.numpy_msg import numpy_msg
 
-ip = "150.203.212.202" #"130.56.95.182" # "192.168.12.111" #
-#ip = "192.168.12.91"
+ip = "192.168.12.91"
+
 port = 6000
 
 vicon_val = False;
@@ -79,10 +79,11 @@ def extract_state(state):
 
 def callback(data):
     global vicon_val;
-    vicon_val = True;
     global x_before, y_before, z_before, roll_before, pitch_before, yaw_before
     global clientsocket
     global receivedData
+    vicon_val = True;
+
     x = data.transforms[0].transform.translation.x;
     y = data.transforms[0].transform.translation.y;
     z = data.transforms[0].transform.translation.z;
@@ -145,15 +146,13 @@ def false_data():
 		clientsocket.close()
 		connect()
 		time.sleep(1)
-# copied
+
 def valid_float(s):
     try:
         float(s)
         return True
     except ValueError:
         return False
-#end copy
-    
 
 def listener():
     global receivedData
@@ -162,9 +161,7 @@ def listener():
     # Publish phone data
     rospy.init_node('phone', anonymous=True)
 
-    # Subscribe to the /tf message
-    # rospy.Subscriber("tf", tfMessage, callback, queue_size = 10)
-    # Subscribe to vehicle state, this already has vicon
+    # Subscribe to vehicle state: \zeta, R, V 
     rospy.Subscriber("vehicle_state", Float64MultiArray, extract_state, queue_size = 10)
     count = 0;
     while not rospy.is_shutdown():
@@ -178,7 +175,7 @@ def listener():
 
 		pub = rospy.Publisher('phone', Float64MultiArray,queue_size=10)
 		r = rospy.Rate(10) # 10hz
-		#if isinstance((receivedData[0]), float) == True:
+		
 		if valid_float(receivedData[0]) == True:
 			x 	= float(receivedData[0])
 			y 	= float(receivedData[1])

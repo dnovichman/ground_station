@@ -110,7 +110,7 @@ void read_config(void)
         fclose(file);   
 }
 
-/** Function to fill out waypoints array */
+/* Function to fill out waypoints array */
 void fill_wpt(char *s)
 {
 	int i, j = 0, h_count = 0;

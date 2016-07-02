@@ -36,7 +36,7 @@
 using namespace std;
 using namespace Eigen;
 
-/**< Declaration of global variables >*/
+/* Declaration of global variables */
 lmpc_v1::lmpc_V1 lmpc_msg;
 
 // For logging data 

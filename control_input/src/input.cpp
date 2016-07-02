@@ -31,9 +31,9 @@ void read_command(void* serial_ptr)
 	while (1) 
 	{
 		ROS_INFO("In read mode");
-		//int r = gets(s);
+		
 		fgets(s, sizeof(s), stdin);
-		//scanf("%d%f%f%f%f",&number1,&number2,&number3,&number4,&number5);//getchar();getchar();
+
 		output[0] = output[1] = output[2] = output[3] = output[4] = 0;
 		
 		output[data_ind] = atof(&s[0]);
@@ -65,8 +65,7 @@ void publish_on_ros(void* serial_ptr)
 	while (1) 
 	{
 		ROS_INFO("Usage: mode(int 0-100:Hold,Height,Takeoff,Pos,Vel,Yaw,Land) float(-z) float(yaw) float(x) float(y)");
-		//ROS_INFO("Command: %s",s);
-		//ROS_INFO("size no1 %d %f %d %f", sizeof(s), atof(&s[0]), strlen(s), atof(&s[5]));
+		
 		ROS_INFO("Command: %d %3.3f %3.3f %3.3f %3.3f\n",(int)output[0], output[1],output[2],output[3], output[4]);
 
 		msg.data.push_back(output[0]);
@@ -102,14 +101,14 @@ int main(int argc, char **argv)
 
 	if ((serial_thread = g_thread_create((GThreadFunc)publish_on_ros, (void *)fd_ptr, TRUE, &err)) == NULL)
 	{
-	printf("Failed to create serial handling thread: %s!!\n", err->message);
-	g_error_free(err);
+		printf("Failed to create serial handling thread: %s!!\n", err->message);
+		g_error_free(err);
 	}
 	
 	if ((serial_thread = g_thread_create((GThreadFunc)read_command, (void *)fd_ptr, TRUE, &err)) == NULL)
 	{
-	printf("Failed to create serial handling thread: %s!!\n", err->message);
-	g_error_free(err);
+		printf("Failed to create serial handling thread: %s!!\n", err->message);
+		g_error_free(err);
 	}
 
 	ros::spin();

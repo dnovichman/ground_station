@@ -57,13 +57,22 @@ struct system_config
 };
 
 
-/** Function definitions */
+/* Remove spaces from characters */
 void remove_space(char *in, char *out);
+
+/* Read config file */
 void read_config(void);
+
+/* Fill waypoint file */
 void fill_wpt(char *s);
+
+/* Read waypoint file */
 void read_wpt_file(void);
+
+/* Waypoint following condition */
 int waypoint_following(void);
 
+/* Check constraints */
 void check_constraints(float* des, float* outp);
 
 #endif
