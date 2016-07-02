@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "px4_ros.h"
 #include "lmpc_V1.h"
-#include<time.h>
+#include <time.h>
 #include <cstdlib>
 #include <string.h>
 
@@ -16,13 +16,11 @@
 #include <sys/stat.h>
 
 using namespace std;
+
 char fileName[100];
-char log_dir[100] = "/log_data/logs";//"/home/dnovichman/ANU_GroundStation/log_data/logs";
+char log_dir[100] = "/log_data/logs";
 char log_tmp_dir[100];
 FILE *fd_log;
-
-
-#define ts 0.018182// 50Hz used as baseline
 
 double t = 0, pt = 0, dt = 0;
 double dtt = 0.005;

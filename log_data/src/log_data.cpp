@@ -23,9 +23,8 @@ char newf[100];
 
 int my2_strcmp(char *s1, char *s2)
 {     
-	//int i = 0;
-	int len = (int)strlen(s1); //sizeof(s1)/sizeof(s1[0]);
-	int len2 = (int)strlen(s2); //sizeof(s2)/sizeof(s2[0]);
+	int len = (int)strlen(s1); 
+	int len2 = (int)strlen(s2); 
 
 	if (len != len2+1)
 		return 1;
@@ -89,7 +88,7 @@ void create_log_file(void)
 
 /**
   * Decode vicon data
-  * TODO do velocity estimation correctly.. see quad code
+  * Most of the below code is obsolete as velocity is estimated onborad vehicle
 */
 void decode_vicon(const geometry_msgs::TransformStamped::ConstPtr& msg)
 {	
@@ -110,7 +109,7 @@ void decode_vicon(const geometry_msgs::TransformStamped::ConstPtr& msg)
 tf::Matrix3x3 R_matrix_test(q);
 	R_matrix_test.getEulerYPR(yaw, pitch, roll);
 
-double p1, r1;
+	double p1, r1;
 	p1 = pitch;
 	r1 = roll;
 
@@ -139,16 +138,16 @@ double p1, r1;
 	R_matrix[8] = ctheta*cphi; 		    //33
 
 	/* Rotate Vehicle & reference position from \frameA to \frameB */
-	x = x_tmp*R_matrix[0] + y_tmp*R_matrix[1] + z_tmp*R_matrix[2]; //good
-	y = x_tmp*R_matrix[3] + y_tmp*R_matrix[4] + z_tmp*R_matrix[5]; //good
-	z = x_tmp*R_matrix[6] + y_tmp*R_matrix[7] + z_tmp*R_matrix[8]; //good
+	x = x_tmp*R_matrix[0] + y_tmp*R_matrix[1] + z_tmp*R_matrix[2]; 
+	y = x_tmp*R_matrix[3] + y_tmp*R_matrix[4] + z_tmp*R_matrix[5]; 
+	z = x_tmp*R_matrix[6] + y_tmp*R_matrix[7] + z_tmp*R_matrix[8]; 
 
 	
 	px = px_tmp*R_matrix[0] + py_tmp*R_matrix[1] + pz_tmp*R_matrix[2];
 	py = px_tmp*R_matrix[3] + py_tmp*R_matrix[4] + pz_tmp*R_matrix[5];
 	pz = px_tmp*R_matrix[6] + py_tmp*R_matrix[7] + pz_tmp*R_matrix[8];
 
-	// velocity observer
+	/* velocity observer */
 	if (dtv > 0.005)
 	{
 		ptv = tv;
@@ -252,24 +251,19 @@ int main(int argc, char **argv)
 
 	/* Create Log File */
 	create_log_file();
-	int count = 0;
+
 	ros::Rate loop_rate(100);
 
 	/* Continuously write file */
 	while (ros::ok())
 	{
 		write_file();
-
-		// %EndTag(PUBLISH)%
-
+		
 		// %Tag(SPINONCE)%
 		ros::spinOnce();
-		// %EndTag(SPINONCE)%
-
+		
 		// %Tag(RATE_SLEEP)%
-		loop_rate.sleep();
-		// %EndTag(RATE_SLEEP)%
-		++count;
+		loop_rate.sleep();		
 	}
 	fclose(fd_log);
 }

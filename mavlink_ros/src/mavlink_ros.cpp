@@ -1,26 +1,3 @@
-/*=====================================================================
- 
- MAVCONN Micro Air Vehicle Flying Robotics Toolkit
- 
- (c) 2009, 2010 MAVCONN PROJECT  <http://MAVCONN.ethz.ch>
- 
- This file is part of the MAVCONN project
- 
- MAVCONN is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- 
- MAVCONN is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with MAVCONN. If not, see <http://www.gnu.org/licenses/>.
- 
- ======================================================================*/
-
 /***********************************************************************************
 *										   *
 * @file										   *
@@ -508,33 +485,32 @@ void* serial_wait(void* serial_ptr)
 					if (imu_raw_pub.getNumSubscribers() > 0)
 					{
 
-					sensor_msgs::ImuPtr imu_msg(new sensor_msgs::Imu);
+						sensor_msgs::ImuPtr imu_msg(new sensor_msgs::Imu);
 
-					imu_msg->angular_velocity.x = imu_raw.xgyro;
-					imu_msg->angular_velocity.y = -imu_raw.ygyro;
-					imu_msg->angular_velocity.z = -imu_raw.zgyro;
+						imu_msg->angular_velocity.x = imu_raw.xgyro;
+						imu_msg->angular_velocity.y = -imu_raw.ygyro;
+						imu_msg->angular_velocity.z = -imu_raw.zgyro;
 
-					imu_msg->linear_acceleration.x = imu_raw.xacc;
-					imu_msg->linear_acceleration.y = -imu_raw.yacc;
-					imu_msg->linear_acceleration.z = -imu_raw.zacc;
+						imu_msg->linear_acceleration.x = imu_raw.xacc;
+						imu_msg->linear_acceleration.y = -imu_raw.yacc;
+						imu_msg->linear_acceleration.z = -imu_raw.zacc;
 
-					for (sensor_msgs::Imu::_angular_velocity_covariance_type::iterator it =
-					imu_msg->angular_velocity_covariance.begin(); it != imu_msg->angular_velocity_covariance.end(); ++it)
-					*it = 0;
+						for (sensor_msgs::Imu::_angular_velocity_covariance_type::iterator it =
+						imu_msg->angular_velocity_covariance.begin(); it != imu_msg->angular_velocity_covariance.end(); ++it)
+						*it = 0;
 
-					for (sensor_msgs::Imu::_linear_acceleration_covariance_type::iterator it =
-					imu_msg->linear_acceleration_covariance.begin(); it != imu_msg->linear_acceleration_covariance.end();
-					++it)
-					*it = 0;
+						for (sensor_msgs::Imu::_linear_acceleration_covariance_type::iterator it =
+						imu_msg->linear_acceleration_covariance.begin(); it != imu_msg->linear_acceleration_covariance.end();
+						++it)
+						*it = 0;
 
-					imu_msg->orientation_covariance[0] = -1;
+						imu_msg->orientation_covariance[0] = -1;
 
-					imu_msg->header = header;
+						imu_msg->header = header;
 
-					imu_raw_pub.publish(imu_msg);
+						imu_raw_pub.publish(imu_msg);
 
-					px4_pub.publish(px4_msg);
-
+						px4_pub.publish(px4_msg);
 					}
 
 				}
