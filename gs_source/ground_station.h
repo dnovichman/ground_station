@@ -15,17 +15,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//#include <Eigen/Dense>
-
 #define pi 3.1415926
 #define g 9.81
 
 #define MAXBUF 1024
 #define DELIM "="
-#define config_file "/home/dnovichman/ANU_GroundStation/ground_station.config"
-
-//using namespace Eigen;
-
+#define config_file "/home/dnovichman/ANU_GroundStation/ground_station.config" 
+#define config_file "../ground_station.config" 
 
 FILE *fd;
 

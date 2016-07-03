@@ -1,3 +1,14 @@
+/****************************************************************************************
+*											*
+*		Ground station file reading code					*
+*											*
+*											*
+*	Develeoper: Moses Bangura							*
+*			moses.bangura@anu.edu.au					*
+*			dnovichman@hotmail.com						*
+*			Australian National University					*
+****************************************************************************************/
+
 #include "ground_station.h"
 
 struct system_config config;
@@ -153,18 +164,15 @@ void fill_wpt(char *s)
 		{
 			if (curval == 0x0A)
 			{
-				//printf("End of Line\n");
 				data_ind = 0;
 				j++;
 				wpts[j][data_ind] = atof(&s[i+1]);
-				//i=i+1;
 			}
 
 			if (((curval == 44) || (curval == 0x20)) && (curval != 0x0A)) //44 is comma and 0x20 is white space 0x0A 0x76
 			{
 				data_ind++;
 				wpts[j][data_ind] = atof(&s[i+1]);
-				//printf("wpts %f %d %d\n",wpts[j][data_ind],i,strlen(s));
 			}
 		}				
 	}
@@ -197,7 +205,6 @@ void read_wpt_file(void)
 
 void check_constraints(float* des, float* outp)
 {
-	//memset(outp, 0, sizeof outp);
 
 	/* Check x */
 	if (des[0] > config.max_x)
