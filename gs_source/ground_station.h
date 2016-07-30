@@ -21,7 +21,7 @@
 #define MAXBUF 1024
 #define DELIM "="
 #define config_file "/home/dnovichman/ANU_GroundStation/ground_station.config" 
-#define config_file "../ground_station.config" 
+#define config_file "ground_station.config" 
 
 FILE *fd;
 

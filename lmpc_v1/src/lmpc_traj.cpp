@@ -327,7 +327,7 @@ void rectangle_flight(void)
 */
 void position_controlx(void)
 {
-	xd[0] = 1.0;  //1.6 for TRO paper
+	xd[0] = 1.2;  //1.6 for TRO paper
 	xd[1] = 0; 
 	xd[2] = -1.10; 
 	xd[3] = 0;
@@ -800,6 +800,30 @@ void Desired_State(const std_msgs::Float64MultiArray::ConstPtr& msg2)
 		xd[7] = 0.0f;
 		xd[8] = 0.0f;
 		des_yaw =  haptic_des[3];
+	} else if (flight == 64)
+	{
+		xd[0] = 1.2f;
+		xd[1] = 0.0f;
+		xd[2] = 0.0f;
+		xd[3] = 0.0f; 
+		xd[4] = 0.0f; 
+		xd[5] = 0.0f; 
+		xd[6] = 0.0f;
+		xd[7] = 0.0f;
+		xd[8] = 0.0f;
+		des_yaw =  0.0f;
+	} else if (flight == 60)
+	{
+		xd[0] = 0;
+		xd[1] = 0;
+		xd[2] = 0;
+		xd[3] = 0.0f; 
+		xd[4] = 0.0f; 
+		xd[5] = 0.0f; 
+		xd[6] = 0.0f;
+		xd[7] = 0.0f;
+		xd[8] = 0.0f;
+		des_yaw =  0.0f;
 	} else
 	{
 		flight = -1;

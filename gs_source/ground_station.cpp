@@ -19,10 +19,10 @@ void remove_space(char *in, char *out)
 	int str = (int)strlen(in);
 	for (int j = 0; j < str-1; j++ )
     	{
-	if ((in[j] != 44) || (in[j] != 0x0A) || (in[j] != 0x20) || (in[j] != 0x2c) || (in[j] != 0x2b))
-	{
-	 	out[j] = in[j];
-	}
+		if ((in[j] != 44) || (in[j] != 0x0A) || (in[j] != 0x20) || (in[j] != 0x2c) || (in[j] != 0x2b))
+		{
+		 	out[j] = in[j];
+		}
 	}
 }
 
