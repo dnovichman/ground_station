@@ -18,6 +18,8 @@
 #include "std_msgs/Float32MultiArray.h"
 #include "lmpc_V1.h"
 
+#include "../include/mavlink/v2.0/cmu_mavlink/mavlink.h"
+
 #include "mavlink.h"
 #include <glib.h>
 #include <iostream>
@@ -78,6 +80,13 @@ float RC[8];
 mavlink_vicon_position_estimate_t pos; //vicon data
 mavlink_attitude_quaternion_t att_vicon;
 mavlink_set_position_target_local_ned_t traj;
+
+// CMU dialects
+mavlink_cascaded_cmd_gains_t 		cmu_att_cmd_gains;
+mavlink_mocap_position_cmd_gains_t 	cmu_pos_cmd_gains;
+mavlink_mocap_multi_pose_t 		cmu_mpose;
+mavlink_mocap_position_cmd_t 		cmu_mcmd;
+mavlink_mocap_motor_state_t 		cmu_motor_state;
 
 ros::Subscriber mavlink_sub;
 ros::Publisher mavlink_pub;

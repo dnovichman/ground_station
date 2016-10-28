@@ -209,14 +209,14 @@ bool setup_port(int fd_port, int baud, int data_bits, int stop_bits, bool parity
       // These two non-standard (by the 70'ties ) rates are fully supported on
       // current Debian and Mac OS versions (tested since 2010).
     case 460800:
-      if (cfsetispeed(&config, 460800) < 0 || cfsetospeed(&config, 460800) < 0)
+      if (cfsetispeed(&config, B460800) < 0 || cfsetospeed(&config, B460800) < 0)
       {
         fprintf(stderr, "\nERROR: Could not set desired baud rate of %d Baud\n", baud);
         return false;
       }
       break;
     case 921600:
-      if (cfsetispeed(&config, 921600) < 0 || cfsetospeed(&config, 921600) < 0)
+      if (cfsetispeed(&config, B921600) < 0 || cfsetospeed(&config, B921600) < 0)
       {
         fprintf(stderr, "\nERROR: Could not set desired baud rate of %d Baud\n", baud);
         return false;
@@ -255,6 +255,23 @@ void get_trajectory(lmpc_v1::lmpc_V1 msg)
 		trajectory[i] = msg.desired_state[i];
 	}
 	des_yaw = msg.desired_yaw;
+
+	// Hadle CMU stuff
+	for (int i=0; i<3; i++)
+	{
+		cmu_mcmd.pos[i] = (int16_t)trajectory[i]*1e3;
+		cmu_mcmd.vel[i] = (int16_t)trajectory[2+i]*1e3;
+		cmu_mcmd.acc[i] = (int16_t)trajectory[5+i]*1e3;
+		cmu_mcmd.jerk[i] = 0;
+	}
+	cmu_mcmd.pos[2] = (int16_t)(1.1*1e3); //fix my convention with labs
+	cmu_mcmd.heading[0] = (int16_t)(des_yaw*1e4);
+	cmu_mcmd.heading[1] = 0;
+	cmu_mcmd.heading[2] = 0;
+	cmu_mcmd.target_system = sysid;
+
+	cmu_motor_state.state = 1;
+	cmu_motor_state.target_system = sysid;	
 }
 
 /** 
@@ -295,6 +312,44 @@ tf::Matrix3x3 R_matrix_test(q);
 	//stuff_vehicle_state();
 
 	vicon_available = true;
+
+	//Handle CMU stuff	
+	cmu_mpose.npose = 1;
+	cmu_mpose.ids[0] = sysid;
+	cmu_mpose.pose[0] = (int16_t)(msg->transform.translation.x*1000);	
+	cmu_mpose.pose[1] = (int16_t)(msg->transform.translation.y*1000);
+	cmu_mpose.pose[2] = (int16_t)(msg->transform.translation.z*1000);
+	cmu_mpose.pose[3] = (int16_t)(yaw*10000);
+
+	// CMU controller gains
+	for (int i=0; i<3; i++)
+	{
+		cmu_att_cmd_gains.kR[i] = 0.0f;
+		cmu_att_cmd_gains.kOm[i] = 0.0f;
+		cmu_pos_cmd_gains.kp[i] = 0.0f;
+		cmu_pos_cmd_gains.kd[i] = 0.0f;
+	}
+	/* Position gains */
+	cmu_pos_cmd_gains.kp[0] = 15.0f;
+	cmu_pos_cmd_gains.kp[1] = 15.0f;
+	cmu_pos_cmd_gains.kp[2] = 30.0f;
+
+	cmu_pos_cmd_gains.kd[0] = 7.746f;
+	cmu_pos_cmd_gains.kd[1] = 7.746f;
+	cmu_pos_cmd_gains.kd[2] = 10.9545f;
+
+	/* Attitude control gains */
+	cmu_att_cmd_gains.kR[0] = 130.0f;
+	cmu_att_cmd_gains.kR[1] = 137.80f;
+	cmu_att_cmd_gains.kR[2] = 100.0f;
+
+	cmu_att_cmd_gains.kOm[0] = 22.8035;
+	cmu_att_cmd_gains.kOm[1] = 23.4776;
+	cmu_att_cmd_gains.kOm[2] = 20.0f;
+
+
+	cmu_att_cmd_gains.target_system = sysid;
+	cmu_pos_cmd_gains.target_system = sysid;
 }
 
 
@@ -319,6 +374,9 @@ void write_to_mavlink(void* serial_ptr)
 		mavlink_message_t msg_vicon;
 		mavlink_message_t msg_des;
 
+		mavlink_message_t cmu_multiple_pos, cmu_cascaded_att_gains, cmu_cascaded_pos_gains, cmu_pos_command, cmu_motor;
+		
+
 		/* Write desired position/trajectory setpoint this should really be hardcoded in px4 */
 		traj.x = trajectory[0];
 		traj.y = trajectory[1]; 
@@ -334,8 +392,9 @@ void write_to_mavlink(void* serial_ptr)
 		traj.target_component = compid;
 		traj.coordinate_frame = 8;
 		
-		ROS_INFO("x,y,z %f,%f,%f,%f",traj.vx,traj.vy,traj.z,traj.yaw); 
-		usleep(25000);
+		ROS_INFO("x,y,z %u,%u,%u,%u",cmu_mpose.pose[0],cmu_mpose.pose[1],cmu_mpose.pose[2],cmu_mpose.pose[3]); 
+		//usleep(25000);
+		usleep(12500);
 		memset(buf, 0, BUFFER_LENGTH);
 				
 		tv1 = ros::Time::now().toSec();
@@ -346,7 +405,11 @@ void write_to_mavlink(void* serial_ptr)
 
 		dt = t - pt;
 		freq = 1/dt;
-
+cmu_mpose.time_usec = uint32_t(pos.usec);
+cmu_mcmd.time_usec = uint32_t(pos.usec);
+cmu_att_cmd_gains.time_usec = uint32_t(pos.usec);
+cmu_pos_cmd_gains.time_usec = uint32_t(pos.usec);
+cmu_motor_state.time_usec = uint32_t(pos.usec);
 		traj.time_boot_ms = uint32_t(pos.usec);
 
 		vic_freq = 1/(att_vicon.q1 - old_vt)*1000000;
@@ -357,7 +420,14 @@ void write_to_mavlink(void* serial_ptr)
 		float old_time_check = 0.0f;
 		stuff_vehicle_vic_gps();
 
-		if (dt !=dt || dt > 0.02f)
+		// Publish CMU stuff
+		mavlink_msg_mocap_multi_pose_encode(sysid, compid, &cmu_multiple_pos, &cmu_mpose);
+		mavlink_msg_cascaded_cmd_gains_encode(sysid, compid, &cmu_cascaded_att_gains, &cmu_att_cmd_gains);
+		mavlink_msg_mocap_position_cmd_gains_encode(sysid, compid, &cmu_cascaded_pos_gains, &cmu_pos_cmd_gains);
+		mavlink_msg_mocap_position_cmd_encode(sysid, compid, &cmu_pos_command, &cmu_mcmd);
+		mavlink_msg_mocap_motor_state_encode(sysid, compid, &cmu_motor, &cmu_motor_state);
+
+		if (dt !=dt || dt > 0.01f)
 		{
 			stuff_vehicle_state();
 			mavlink_msg_set_position_target_local_ned_encode(sysid, compid, &msg_des, &traj);
@@ -365,15 +435,33 @@ void write_to_mavlink(void* serial_ptr)
 			bytes_sent += write(fd_port, (char*)buf, len);
 			memset(buf, 0, BUFFER_LENGTH);
 
-			if (vicon_available)
-			{
-				len = mavlink_msg_to_send_buffer(buf, &msg_vicon);
-				bytes_sent += write(fd_port, (char*)buf, len);
-				ROS_INFO("true yaw pitch roll %f %f %f\n",pos.yaw*180/pi,pos.pitch*180/pi,pos.roll*180/pi); 
+			//if (vicon_available)
+			//{
+				//len = mavlink_msg_to_send_buffer(buf, &msg_vicon);
+				//bytes_sent += write(fd_port, (char*)buf, len);
+				//ROS_INFO("true yaw pitch roll %f %f %f\n",pos.yaw*180/pi,pos.pitch*180/pi,pos.roll*180/pi); 
 				vicon_available = false;
 				ROS_INFO("time check %f %f\n",(check_time - old_time_check)/1000000,1000000/(check_time - old_time_check));
 				old_time_check=check_time;
-			}
+
+				// Send CMU stuff
+				len = mavlink_msg_to_send_buffer(buf, &cmu_multiple_pos);
+				bytes_sent += write(fd_port, (char*)buf, len);
+				memset(buf, 0, BUFFER_LENGTH);
+				len = mavlink_msg_to_send_buffer(buf, &cmu_cascaded_att_gains);
+				bytes_sent += write(fd_port, (char*)buf, len);
+				memset(buf, 0, BUFFER_LENGTH);
+				len = mavlink_msg_to_send_buffer(buf, &cmu_cascaded_pos_gains);
+				bytes_sent += write(fd_port, (char*)buf, len);
+				memset(buf, 0, BUFFER_LENGTH);
+				len = mavlink_msg_to_send_buffer(buf, &cmu_pos_command);
+				bytes_sent += write(fd_port, (char*)buf, len);
+				memset(buf, 0, BUFFER_LENGTH);
+
+				len = mavlink_msg_to_send_buffer(buf, &cmu_motor);
+				bytes_sent += write(fd_port, (char*)buf, len);
+				memset(buf, 0, BUFFER_LENGTH);
+			//}
 			pt = t;	
 			count++;
 		}					
@@ -433,6 +521,8 @@ void* serial_wait(void* serial_ptr)
 			rosmavlink_msg.sysid = message.sysid;
 			rosmavlink_msg.compid = message.compid;
 			rosmavlink_msg.msgid = message.msgid;
+
+			sysid = message.sysid;
 
 			mavlink_pub.publish(rosmavlink_msg);
 
