@@ -283,6 +283,14 @@ tf::Matrix3x3 R_matrix_test(q);
 	pos.roll = -p1;
 	pos.yaw = -yaw;
 
+	//for cmu yaw -> 0 to 2pi
+	pos.yaw = -yaw - pi/2.0f;
+	//if (pos.yaw < 0)
+	//	pos.yaw = 2.0f*pi + pos.yaw;
+
+	pos.roll = r1;
+	pos.pitch = -p1;
+
 	dtt = dtv;	
 
 	global_x = pos.x;
@@ -425,6 +433,8 @@ void* serial_wait(void* serial_ptr)
 
 			ROS_INFO("Received message from serial with ID #%d (sys:%d|comp:%d):\n", message.msgid, message.sysid,
 				 message.compid);
+
+			sysid = message.sysid;
 
 			mavlink_ros::Mavlink rosmavlink_msg;
 
