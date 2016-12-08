@@ -21,5 +21,5 @@ gnome-terminal --tab -e "bash -c 'rosrun control_input control_input ' " --tab -
 
 ################################# Terminal 4 #######################################
 # Start phone app, visualisation software and additional software
-
+gnome-terminal --tab -e "bash -c 'rosrun GPS_indicator GPS_indicator' "
 

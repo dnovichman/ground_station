@@ -5,6 +5,7 @@ mavlink_ros/build/
 mavlink_ros/msg_gen/
 build/
 msg_gen/
+GPS_indicator/build
 
 /control_input/bin/
 /lmpc_v1/bin/

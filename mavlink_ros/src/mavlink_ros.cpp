@@ -209,14 +209,14 @@ bool setup_port(int fd_port, int baud, int data_bits, int stop_bits, bool parity
       // These two non-standard (by the 70'ties ) rates are fully supported on
       // current Debian and Mac OS versions (tested since 2010).
     case 460800:
-      if (cfsetispeed(&config, 460800) < 0 || cfsetospeed(&config, 460800) < 0)
+      if (cfsetispeed(&config, B460800) < 0 || cfsetospeed(&config, B460800) < 0)
       {
         fprintf(stderr, "\nERROR: Could not set desired baud rate of %d Baud\n", baud);
         return false;
       }
       break;
     case 921600:
-      if (cfsetispeed(&config, 921600) < 0 || cfsetospeed(&config, 921600) < 0)
+      if (cfsetispeed(&config, B921600) < 0 || cfsetospeed(&config, B921600) < 0)
       {
         fprintf(stderr, "\nERROR: Could not set desired baud rate of %d Baud\n", baud);
         return false;
@@ -342,7 +342,9 @@ void write_to_mavlink(void* serial_ptr)
 		traj.target_component = compid;
 		traj.coordinate_frame = 8;
 		
+	#if 0
 		ROS_INFO("x,y,z %f,%f,%f,%f",traj.vx,traj.vy,traj.z,traj.yaw); 
+	#endif
 		usleep(25000);
 		memset(buf, 0, BUFFER_LENGTH);
 				
@@ -358,8 +360,9 @@ void write_to_mavlink(void* serial_ptr)
 		traj.time_boot_ms = uint32_t(pos.usec);
 
 		vic_freq = 1/(att_vicon.q1 - old_vt)*1000000;
+	#if 0
 		ROS_INFO("dt and Freq bytes time %f %f %f",dt,freq, vic_freq);
-
+	#endif
 		// TODO only publish when data is available
 		float check_time = pos.usec ;
 		float old_time_check = 0.0f;
@@ -415,9 +418,13 @@ void* serial_wait(void* serial_ptr)
 		      msgReceived = mavlink_parse_char(MAVLINK_COMM_1, cp, &message, &status);
 		      if (lastStatus.packet_rx_drop_count != status.packet_rx_drop_count)
 		      {
+			#if 0
 			  printf("ERROR: DROPPED %d PACKETS\n", status.packet_rx_drop_count);
+			#endif
 			  unsigned char v = cp;
+			#if 0
 			  fprintf(stderr, "%02x ", v);
+			#endif
 		      }
 
 		      lastStatus = status;
@@ -430,9 +437,10 @@ void* serial_wait(void* serial_ptr)
 		/* Decode mavlink received msgs */
 		if (msgReceived)
 		{
-
+		#if 0
 			ROS_INFO("Received message from serial with ID #%d (sys:%d|comp:%d):\n", message.msgid, message.sysid,
 				 message.compid);
+		#endif
 
 			sysid = message.sysid;
 
@@ -535,6 +543,20 @@ void* serial_wait(void* serial_ptr)
 					global_vy = onboard_vel.y;
 					global_vz = onboard_vel.z;
 
+				}
+				break;
+
+				/* Now moved to vision position_est */
+				case MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE:
+				{
+					mavlink_vision_position_estimate_t onboard_vel;
+					mavlink_msg_vision_position_estimate_decode(&message, &onboard_vel);
+					global_vx = onboard_vel.x;
+					global_vy = onboard_vel.y;
+					global_vz = onboard_vel.z;
+					//#if 0
+						printf("Veh vel %f %f %f\n",global_vx,global_vy,global_vz);
+					//#endif
 				}
 				break;
 
